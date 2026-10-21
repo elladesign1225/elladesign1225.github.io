@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
-:root{--paper:#f9f8f5;--surface:#fff;--ink:#181b20;--muted:#687076;--line:#dadbd6;--soft:#eceeea;--accent:#dbe8e4;--orange:#d66548;--radius:8px;--max:1290px}
+:root{--paper:#f9f8f5;--surface:#fff;--ink:#181b20;--muted:#687076;--line:#dadbd6;--soft:#eceeea;--accent:#dbe8e4;--orange:#509fcf;--radius:8px;--max:1290px}
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:95px}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:'DM Sans',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
@@ -50,3 +50,13 @@ button{font:inherit}img,video{display:block;max-width:100%}img{height:auto}figur
 @media (max-width:1000px){.container{width:min(var(--max),calc(100% - 54px))}.hero{gap:27px;min-height:0}.hero h1{font-size:clamp(53px,7vw,85px)}.hero-art{height:480px}.project-card figure{height:285px}.art-grid{grid-template-columns:repeat(2,1fr)}.intro-split{gap:38px}}
 @media (max-width:720px){.container{width:min(var(--max),calc(100% - 36px))}.header-inner{min-height:69px;flex-wrap:wrap;gap:0}.brand{font-size:14px}.brand-mark{height:36px;width:36px}.nav-toggle{display:inline-block;margin-left:auto}.nav{display:none;flex-direction:column;align-items:stretch;width:100%;padding:12px 0 25px;gap:3px}.nav.open{display:flex}.nav a{font-size:13px;padding:10px}.nav a::after{display:none}.hero{display:flex;flex-direction:column;padding:65px 0 45px;align-items:stretch}.hero h1{font-size:clamp(53px,11vw,74px)}.hero-art{height:450px}.hero-description{font-size:16px}.section{padding:66px 0}.section-head{align-items:start;flex-direction:column}.section-head h2{font-size:38px}.work-grid,.art-grid{grid-template-columns:1fr;gap:32px}.project-card.featured{grid-column:auto}.project-card figure,.project-card.featured figure,.art-grid .project-card figure{height:300px}.project-card h3{font-size:24px}.intro-split,.bio-layout,.contact-layout{grid-template-columns:1fr;gap:30px}.intro-split img{height:370px}.bio-layout .visual{position:static}.bio-layout .visual img{height:380px}.page-hero{padding:56px 0 40px}.page-title{font-size:clamp(55px,12vw,80px)}.page-lead{font-size:16px}.article{padding-bottom:60px}.article .lede{font-size:18px}.article .two-up{grid-template-columns:1fr}.footer-top,.footer-bottom{flex-direction:column}.contact-box{padding:36px 25px}.contact-layout{padding-bottom:55px}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Ella Design custom logo and blue color identity */
+.brand-logo{width:44px;height:44px;display:block;object-fit:contain;flex-shrink:0}
+.hero-signature{display:block;width:155px;height:auto;max-height:150px;object-fit:contain;object-position:left center;margin-bottom:10px}
+.hero-signature + .eyebrow{margin-top:4px}
+.hero-art::before{background:#dceef7}
+.section-highlight{background:#eaf4f9}
+.intro-split img{background:#d7eaf4}
+.contact-box{background:#e4f2f9}
+@media(max-width:720px){.brand-logo{width:37px;height:37px}.hero-signature{width:125px;max-height:118px}}
