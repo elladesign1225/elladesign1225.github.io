@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Camellia Atelier | My Sketchbook</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: #fff; color: #111; font-family: Arial, Helvetica, sans-serif; }
+    .sketchbook { width: min(1080px, calc(100% - 40px)); margin: 30px auto 55px; }
+    header { margin: 0 0 18px; font-size: 15px; line-height: 1.3; }
+    header h1 { margin: 0 0 9px; font-size: 20px; font-weight: 600; letter-spacing: -.4px; }
+    header p { margin: 0; }
+    #brush-status { color: #526849; margin-top: 8px; font-size: 13px; }
+    #canvas-holder { margin: 0 auto; width: fit-content; max-width: 100%; line-height: 0; }
+    #canvas-holder canvas { display: block; width: 100% !important; max-width: 960px; height: auto !important; background: white; border: 1px solid #ededed; touch-action: none; cursor: crosshair; }
+    .buttons { width: max-content; margin: 12px auto 0; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+    button { font: 14px/1.2 Arial, Helvetica, sans-serif; padding: 3px 9px; border: 1px solid #888; border-radius: 3px; background: #f7f7f7; color: #111; cursor: pointer; }
+    button:hover { background: #e8efe3; }
+    button:focus-visible { outline: 2px solid #4c7e4c; outline-offset: 2px; }
+    .help { max-width: 480px; margin: 16px auto 0; padding: 16px 20px; border: 1px solid #ddd; font-size: 13px; line-height: 1.55; }
+    .help[hidden] { display: none; }
+    .help h2 { font-size: 15px; margin: 0 0 7px; }
+    .help p { margin: 5px 0; }
+    .help-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; }
+    kbd { font-family: monospace; border: 1px solid #bbb; background: #f8f8f8; border-radius: 2px; padding: 1px 4px; }
+    @media (max-width: 600px) { .sketchbook { width: calc(100% - 20px); margin-top: 20px; } header { margin: 4px 6px 12px; } header h1 { font-size: 18px; } .help { margin: 16px 6px; } }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/p5.min.js"></script>
+</head>
+<body>
+  <main class="sketchbook">
+    <header>
+      <h1>Camellia Atelier — My Sketchbook</h1>
+      <p>press numerical keys from 1 - 0 for different botanical brush strokes</p>
+      <p>click or drag to draw · press s to save your image, x to clear, or z to undo</p>
+      <p>press g to grow a white camellia · use the help button to see all ten brushes</p>
+      <p id="brush-status" aria-live="polite">selected brush: 1 — Stem</p>
+    </header>
+    <div id="canvas-holder" aria-label="Interactive botanical drawing canvas"></div>
+    <div class="buttons">
+      <button type="button" id="save">save img</button>
+      <button type="button" id="clear">clear canvas</button>
+      <button type="button" id="help-button" aria-expanded="false" aria-controls="help">help text</button>
+    </div>
+    <section class="help" id="help" hidden>
+      <h2>10 brushes made for botanical drawing</h2>
+      <div class="help-grid">
+        <p><kbd>1</kbd> Stem — organic branches</p><p><kbd>2</kbd> Leaf — green leaf shapes</p>
+        <p><kbd>3</kbd> Petal — soft ivory petals</p><p><kbd>4</kbd> Bloom — layered flowers</p>
+        <p><kbd>5</kbd> Bud — flowers in progress</p><p><kbd>6</kbd> Vein — fine leaf lines</p>
+        <p><kbd>7</kbd> Shadow — deep green shading</p><p><kbd>8</kbd> Light — gentle highlights</p>
+        <p><kbd>9</kbd> Pollen — golden flower dots</p><p><kbd>0</kbd> Grain — subtle texture</p>
+      </div>
+      <p><strong>Other keys:</strong> <kbd>G</kbd> draws an example camellia, <kbd>Z</kbd> undoes a stroke, <kbd>X</kbd> clears, and <kbd>S</kbd> saves a PNG.</p>
+      <p><strong>Artistic choice:</strong> limited botanical colors and marks make flowers easy to represent, but exact mechanical shapes hard to render.</p>
+    </section>
+  </main>
+  <script src="sketch.js"></script>
+  <script>
+    document.getElementById('help-button').addEventListener('click', function () {
+      const panel = document.getElementById('help');
+      const expanded = this.getAttribute('aria-expanded') === 'true';
+      panel.hidden = expanded;
+      this.setAttribute('aria-expanded', String(!expanded));
+    });
+  </script>
+</body>
+</html>
