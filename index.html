@@ -3,74 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Camellia: Shape Sketchbook, a drawing tool with ten simple geometric brushes by Ella Yu.">
-  <title>Camellia | Shape Sketchbook</title>
+  <title>Camellia — Simple Shapes</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/2.3.3/p5.min.js"></script>
+  <script defer src="sketch.js"></script>
   <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; background: #fafaf8; color: #272b28; font: 15px/1.5 Arial, Helvetica, sans-serif; }
-    main { max-width: 1040px; margin: 42px auto 60px; padding: 0 20px; }
-    header { margin-bottom: 20px; }
-    .eyebrow { margin: 0 0 7px; color: #597467; font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
-    h1 { font-size: clamp(25px, 4vw, 34px); font-weight: 600; letter-spacing: -.045em; margin: 0 0 6px; }
-    header p { margin: 0; font-size: 14px; color: #5d625e; }
-    #brush-status { font-size: 13px; font-weight: 700; color: #486b58; margin-top: 10px; }
-    #canvas-holder { line-height: 0; width: 100%; background: white; }
-    #canvas-holder canvas { display: block; width: 100% !important; height: auto !important; border: 1px solid #d6dcd4; background: white; cursor: crosshair; touch-action: none; }
-    .controls { display: flex; align-items: start; gap: 8px; flex-wrap: wrap; margin-top: 13px; }
-    button { border: 1px solid #bbc8bb; padding: 7px 14px; font: 13px Arial, sans-serif; color: #263c2f; background: white; border-radius: 3px; cursor: pointer; }
-    button:hover { background: #edf3ed; }
-    button:focus-visible { outline: 2px solid #456a4e; outline-offset: 3px; }
-    .hint { font-size: 12px; margin: 2px 0 0 auto; color: #818782; }
-    #help { max-width: 780px; border: 1px solid #dce4dc; background: white; padding: 16px 20px; margin-top: 14px; font-size: 13px; }
-    #help[hidden] { display: none; }
-    #help h2 { font-size: 15px; margin: 0 0 10px; }
-    .brush-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 22px; padding: 0; margin: 0; list-style: none; }
-    .brush-list li { display: flex; align-items: center; gap: 9px; }
-    kbd { display: inline-flex; justify-content: center; min-width: 24px; padding: 2px 6px; border: 1px solid #c4cdc4; border-radius: 3px; background: #f4f6f3; font-size: 12px; font-family: monospace; }
-    .note { margin: 12px 0 0; color: #606b63; }
-    @media(max-width:650px) { main { margin-top: 24px; padding: 0 12px; } .brush-list { grid-template-columns: 1fr; } .hint { width: 100%; margin-left: 0; } }
+    body { margin: 24px; font: 15px/1.5 Arial, sans-serif; background: #f5f5f2; color: #344a40; }
+    canvas { display: block; max-width: 100%; height: auto !important; border: 1px solid #ddd; }
+    button { margin: 12px 10px 0 0; padding: 7px 12px; cursor: pointer; }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/p5.min.js"></script>
 </head>
-<body>
-  <main>
-    <header>
-      <p class="eyebrow">Ella Yu · Creative Coding · 2026</p>
-      <h1>Camellia — Shape Sketchbook</h1>
-      <p>Press 1–0 to switch between ten simple shape brushes. Click or drag to draw.</p>
-      <p id="brush-status" aria-live="polite">Selected brush: 1 — Line</p>
-    </header>
-    <div id="canvas-holder" aria-label="Interactive drawing canvas"></div>
-    <div class="controls">
-      <button type="button" id="save-btn">save img</button>
-      <button type="button" id="clear-btn">clear canvas</button>
-      <button type="button" id="help-btn" aria-expanded="false" aria-controls="help">help text</button>
-      <p class="hint">S = save &nbsp; X = clear &nbsp; Z = undo</p>
-    </div>
-    <section id="help" hidden>
-      <h2>Ten brushes</h2>
-      <ul class="brush-list">
-        <li><kbd>1</kbd> Line — thin straight stroke</li>
-        <li><kbd>2</kbd> Circle — solid round marks</li>
-        <li><kbd>3</kbd> Square — solid blocks</li>
-        <li><kbd>4</kbd> Triangle — pointed shapes</li>
-        <li><kbd>5</kbd> Diamond — rotated squares</li>
-        <li><kbd>6</kbd> Ring — empty circles</li>
-        <li><kbd>7</kbd> Star — five-point shapes</li>
-        <li><kbd>8</kbd> Dash — small marks</li>
-        <li><kbd>9</kbd> Plus — crosses</li>
-        <li><kbd>0</kbd> Dots — clusters of tiny circles</li>
-      </ul>
-      <p class="note">This drawing tool focuses on basic geometry, repetition, and pattern. The limited colors and simple marks make abstract compositions easy, but realistic textures and detailed portraits difficult.</p>
-    </section>
-  </main>
-  <script src="sketch.js"></script>
-  <script>
-    document.getElementById('help-btn').addEventListener('click', function() {
-      const help = document.getElementById('help');
-      help.hidden = !help.hidden;
-      this.setAttribute('aria-expanded', String(!help.hidden));
-    });
-  </script>
-</body>
+<body></body>
 </html>
