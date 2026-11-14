@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shy Four — Camellia Connect 4</title>
+<style>
+ :root { --cream:#F7F5EE; --forest:#354B43; --coral:#D79D88; }
+ * { box-sizing:border-box; }
+ body { margin:0; background:var(--cream); color:var(--forest); font:16px/1.4 Arial,sans-serif; }
+ main { width:min(100% - 24px, 660px); margin:22px auto; }
+ header { border-bottom:1px solid var(--forest); padding:0 4px 12px; font-size:14px; font-weight:bold; letter-spacing:.08em; }
+ #game { display:flex; justify-content:center; width:100%; }
+ #game canvas { display:block; width:100% !important; max-width:600px; height:auto !important; touch-action:manipulation; cursor:pointer; }
+ .tip { font-size:12px; text-align:center; margin:4px 0 16px; }
+</style>
+</head>
+<body>
+<main>
+<header>SHY FOUR ✿</header>
+<div id="game" aria-label="Connect Four board; click a column to drop a flower"></div>
+<p class="tip">1 Player · 2 Players · New Game — use the buttons inside the game</p>
+</main>
+<!-- The playable game uses genuine p5.js when the library loads. -->
+<script src="sketch.js"></script>
+<script src="fallback.js"></script>
+<script>
+(function () {
+  let finished = false;
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.10/p5.min.js';
+  script.async = true;
+  function showFallback() {
+    if (finished) return;
+    finished = true;
+    script.onload = null;
+    script.onerror = null;
+    script.remove();
+    window.startShyFourFallback();
+  }
+  // No external library? The game still works immediately via Canvas 2D.
+  const timeout = setTimeout(showFallback, 2500);
+  script.onload = () => {
+    if (finished) return;
+    clearTimeout(timeout);
+    finished = true;
+    // p5 normally boots global sketches at page load; if it arrived
+    // after the load event, initialize it manually once.
+    const ensure = () => {
+      if (!document.querySelector('#game canvas') && typeof window.p5 === 'function') {
+        new window.p5();
+      }
+    };
+    if (document.readyState === 'complete') setTimeout(ensure, 100);
+    else window.addEventListener('load', () => setTimeout(ensure, 100), {once:true});
+  };
+  script.onerror = () => { clearTimeout(timeout); showFallback(); };
+  document.head.appendChild(script);
+})();
+</script>
+</body>
+</html>
