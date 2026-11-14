@@ -1,8 +1,3 @@
-// SHY FOUR — Connect 4 made with p5.js
-// Put white-camellia.png in the same folder as sketch.js.
-// If the image is missing, the game draws a simple flower instead.
-// Player 1 = coral | Player 2 = forest green
-
 const ROWS = 6;
 const COLS = 7;
 const CELL = 61;
