@@ -1,7 +1,3 @@
-// CAMELLIA — SIMPLE SHAPES
-// Adapted from the instructor's p5.js drawing-tool template
-// 10 geometric brushes using keys 1–0
-
 var initials = 'ey';
 var choice = '1';
 var screenbg = 250;
