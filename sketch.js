@@ -1,163 +1,314 @@
-// CAMELLIA — SIMPLE SHAPES
-// Adapted from the instructor's p5.js drawing-tool template
-// 10 geometric brushes using keys 1–0
+// SHY FOUR — Connect 4 made with p5.js
+// Put white-camellia.png in the same folder as sketch.js.
+// If the image is missing, the game draws a simple flower instead.
+// Player 1 = coral | Player 2 = forest green
 
-var initials = 'ey';
-var choice = '1';
-var screenbg = 250;
-var button;
-var brushLabel;
-var lastStampX = -1000;
-var lastStampY = -1000;
+const ROWS = 6;
+const COLS = 7;
+const CELL = 61;
+const BOARD_X = 86;
+const BOARD_Y = 198;
+const CREAM = '#F7F5EE';
+const GREEN = '#354B43';
+const CORAL = '#D79D88';
 
-var brushNames = {
-  '1': 'Thin Line',
-  '2': 'Thick Line',
-  '3': 'Circle',
-  '4': 'Square',
-  '5': 'Triangle',
-  '6': 'Diamond',
-  '7': 'Ring',
-  '8': 'Dash',
-  '9': 'Plus Sign',
-  '0': 'Dots'
-};
+let board = [];
+let currentPlayer = 1;
+let mode = 'computer';     // 'computer' or 'two'
+let gameOver = false;
+let message = '';
+let selectedColumn = 3;
+let falling = null;
+let computerMoveTime = 0;
+let winningPieces = [];
+let flowerImage = null;
+let flowerLoaded = false;
 
 function setup() {
-  createCanvas(600, 600);
-  background(screenbg);
+  const canvas = createCanvas(600, 660);
+  if (document.getElementById('game')) canvas.parent('game');
+  textFont('Arial');
 
-  button = createButton('save img');
-  button.mousePressed(saveme);
+  // The original illustration is optional, so the sketch still runs
+  // in the p5.js editor before you upload the PNG.
+  loadImage('white-camellia.png', (img) => {
+    flowerImage = img;
+    flowerLoaded = true;
+  }, () => {
+    flowerLoaded = false;
+  });
 
-  button = createButton('clear canvas');
-  button.mousePressed(clear_print);
+  newGame();
+}
 
-  button = createButton('help text');
-  button.mousePressed(helpText);
-
-  brushLabel = createP('Selected brush: 1 — Thin Line');
-  helpText();
+function newGame() {
+  board = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+  currentPlayer = 1;
+  gameOver = false;
+  message = '';
+  falling = null;
+  computerMoveTime = 0;
+  winningPieces = [];
+  selectedColumn = 3;
 }
 
 function draw() {
-  // Only draw while the mouse is held inside the canvas.
-  if (mouseIsPressed && mouseX >= 0 && mouseX < width &&
-      mouseY >= 0 && mouseY < height) {
-    newkeyChoice(choice);
+  background(CREAM);
+  drawHeader();
+  drawButtons();
+  drawStatus();
+  drawBoard();
+  drawPreview();
+  animatePiece();
+
+  // Wait a short moment before the computer drops its piece.
+  if (mode === 'computer' && currentPlayer === 2 && !gameOver &&
+      !falling && computerMoveTime && millis() >= computerMoveTime) {
+    computerMoveTime = 0;
+    startDrop(chooseComputerColumn());
   }
 }
 
-function newkeyChoice(toolChoice) {
-  // Brushes 1 and 2 connect the mouse positions to make lines.
-  if (toolChoice === '1') {
-    stroke('#344A40');
-    strokeWeight(2);
-    line(mouseX, mouseY, pmouseX, pmouseY);
-    return;
-  } else if (toolChoice === '2') {
-    stroke('#709A80');
-    strokeWeight(10);
-    line(mouseX, mouseY, pmouseX, pmouseY);
-    return;
+function drawHeader() {
+  fill(GREEN);
+  noStroke();
+  textAlign(CENTER, CENTER);
+  textStyle(BOLD);
+  textSize(30);
+  text('Shy Four', width / 2, 35);
+  textStyle(NORMAL);
+  textSize(14);
+  text('Drop a camellia. Connect four to win.', width / 2, 61);
+
+  textSize(14);
+  text('Click a column or press keys 1–7', width / 2, 602);
+  textSize(15);
+  textStyle(BOLD);
+  text(message || 'Plan your next move!', width / 2, 632);
+  textStyle(NORMAL);
+}
+
+function drawButtons() {
+  buttonBox(83, 87, 133, 37, '1 Player', mode === 'computer');
+  buttonBox(232, 87, 133, 37, '2 Players', mode === 'two');
+  buttonBox(381, 87, 133, 37, 'New Game', false);
+}
+
+function buttonBox(x, y, w, h, label, selected) {
+  stroke(GREEN);
+  strokeWeight(1.5);
+  fill(selected ? GREEN : CREAM);
+  rect(x, y, w, h, 5);
+  noStroke();
+  fill(selected ? CREAM : GREEN);
+  textAlign(CENTER, CENTER);
+  textSize(14);
+  text(label, x + w / 2, y + h / 2);
+}
+
+function drawStatus() {
+  fill(GREEN);
+  noStroke();
+  textAlign(CENTER, CENTER);
+  textStyle(BOLD);
+  textSize(13);
+  let status = gameOver ? 'GAME OVER' :
+    mode === 'computer' ? (currentPlayer === 1 ? 'YOUR TURN' : 'COMPUTER TURN') :
+    'PLAYER ' + currentPlayer + ' TURN';
+  text(status, width / 2, 145);
+  textStyle(NORMAL);
+}
+
+function drawBoard() {
+  noStroke();
+  fill(GREEN);
+  rect(BOARD_X - 11, BOARD_Y - 9, COLS * CELL + 22, ROWS * CELL + 18, 14);
+
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      let x = BOARD_X + c * CELL + CELL / 2;
+      let y = BOARD_Y + r * CELL + CELL / 2;
+      fill(CREAM);
+      circle(x, y, 53);
+      if (board[r][c] !== 0) {
+        let won = winningPieces.some(([wr, wc]) => wr === r && wc === c);
+        drawCoin(x, y, board[r][c], won);
+      }
+    }
+  }
+}
+
+function drawPreview() {
+  if (gameOver || falling || (mode === 'computer' && currentPlayer === 2)) return;
+
+  if (mouseX >= BOARD_X && mouseX < BOARD_X + COLS * CELL &&
+      mouseY >= 165 && mouseY < BOARD_Y + ROWS * CELL) {
+    selectedColumn = constrain(floor((mouseX - BOARD_X) / CELL), 0, 6);
   }
 
-  // Space the shape stamps apart instead of piling up in one spot.
-  if (dist(mouseX, mouseY, lastStampX, lastStampY) < 14) return;
-  lastStampX = mouseX;
-  lastStampY = mouseY;
+  let x = BOARD_X + (selectedColumn + 0.5) * CELL;
+  // Small reference to the original cursor-chase lab:
+  // the preview flower moves a little away from the cursor.
+  if (abs(mouseX - x) < 45 && abs(mouseY - 172) < 45) {
+    x += mouseX < x ? 12 : -12;
+  }
+  if (getOpenRow(selectedColumn) >= 0) {
+    drawCoin(x, 172, currentPlayer, false, 0.83);
+  }
+}
 
+function drawCoin(x, y, player, won = false, alpha = 1) {
   push();
-  rectMode(CENTER);
+  translate(x, y);
+  noStroke();
+  if (won) {
+    stroke(CREAM);
+    strokeWeight(3);
+  }
+  let col = color(player === 1 ? CORAL : GREEN);
+  col.setAlpha(255 * alpha);
+  fill(col);
+  circle(0, 0, 47);
   noStroke();
 
-  if (toolChoice === '3') {
-    fill('#89B2A0');
-    circle(mouseX, mouseY, 32);
-
-  } else if (toolChoice === '4') {
-    fill('#DDA6AD');
-    square(mouseX, mouseY, 30);
-
-  } else if (toolChoice === '5') {
-    fill('#E5BD69');
-    triangle(mouseX, mouseY - 20,
-             mouseX - 20, mouseY + 16,
-             mouseX + 20, mouseY + 16);
-
-  } else if (toolChoice === '6') {
-    fill('#486D70');
-    translate(mouseX, mouseY);
-    rotate(PI / 4);
-    square(0, 0, 28);
-
-  } else if (toolChoice === '7') {
-    noFill();
-    stroke('#83B5C2');
-    strokeWeight(4);
-    circle(mouseX, mouseY, 36);
-
-  } else if (toolChoice === '8') {
-    fill('#344A40');
-    rect(mouseX, mouseY, 25, 7);
-
-  } else if (toolChoice === '9') {
-    stroke('#709A80');
-    strokeWeight(5);
-    line(mouseX - 14, mouseY, mouseX + 14, mouseY);
-    line(mouseX, mouseY - 14, mouseX, mouseY + 14);
-
-  } else if (toolChoice === '0') {
-    fill('#DDA6AD');
-    circle(mouseX - 9, mouseY - 6, 8);
-    fill('#E5BD69');
-    circle(mouseX + 7, mouseY - 8, 6);
-    fill('#83B5C2');
-    circle(mouseX + 8, mouseY + 8, 9);
-    fill('#89B2A0');
-    circle(mouseX - 8, mouseY + 8, 5);
+  if (flowerLoaded && flowerImage) {
+    imageMode(CENTER);
+    tint(255, alpha * 255);
+    image(flowerImage, 0, 0, 40, 40);
+    noTint();
+  } else {
+    // Fallback when the custom image hasn't been uploaded yet.
+    fill(255, 255, 255, 240 * alpha);
+    for (let i = 0; i < 7; i++) {
+      let angle = TWO_PI * i / 7;
+      ellipse(cos(angle) * 9, sin(angle) * 9, 15, 19);
+    }
+    fill(player === 1 ? GREEN : CORAL);
+    circle(0, 0, 6);
   }
-
   pop();
 }
 
-// Reset stamp spacing for a new mouse press.
 function mousePressed() {
-  lastStampX = -1000;
-  lastStampY = -1000;
+  // Simple navigation controls on the same canvas.
+  if (insideButton(83, 87, 133, 37)) {
+    mode = 'computer';
+    newGame();
+    return false;
+  }
+  if (insideButton(232, 87, 133, 37)) {
+    mode = 'two';
+    newGame();
+    return false;
+  }
+  if (insideButton(381, 87, 133, 37)) {
+    newGame();
+    return false;
+  }
+  if (mouseX >= BOARD_X && mouseX < BOARD_X + COLS * CELL &&
+      mouseY >= 155 && mouseY < BOARD_Y + ROWS * CELL) {
+    let c = floor((mouseX - BOARD_X) / CELL);
+    playColumn(c);
+  }
+  return false;
 }
 
-function clear_print() {
-  background(screenbg);
-  helpText();
-}
-
-function saveme() {
-  var filename = initials + '_shapes_' + year() + month() + day() +
-                 '_' + hour() + minute() + second();
-  saveCanvas(filename, 'png');
+function insideButton(x, y, w, h) {
+  return mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + h;
 }
 
 function keyPressed() {
-  if (Object.prototype.hasOwnProperty.call(brushNames, key)) {
-    choice = key;
-    lastStampX = -1000;
-    lastStampY = -1000;
-    brushLabel.html('Selected brush: ' + key + ' — ' + brushNames[key]);
-  } else if (key === 'x' || key === 'X') {
-    clear_print();
-  } else if (key === 'p' || key === 'P') {
-    saveme();
+  if (key >= '1' && key <= '7') playColumn(Number(key) - 1);
+  if (key === 'r' || key === 'R') newGame();
+}
+
+function getOpenRow(column, grid = board) {
+  if (column < 0 || column >= COLS) return -1;
+  for (let row = ROWS - 1; row >= 0; row--) {
+    if (grid[row][column] === 0) return row;
+  }
+  return -1;
+}
+
+function playColumn(column) {
+  if (gameOver || falling || (mode === 'computer' && currentPlayer === 2)) return;
+  startDrop(column);
+}
+
+function startDrop(column) {
+  let row = getOpenRow(column);
+  if (row < 0) return;
+  falling = { row, column, player: currentPlayer, y: 165, speed: 2 };
+}
+
+function animatePiece() {
+  if (!falling) return;
+  let target = BOARD_Y + falling.row * CELL + CELL / 2;
+  falling.speed = min(falling.speed + 1.2, 27);
+  falling.y = min(falling.y + falling.speed, target);
+  let x = BOARD_X + falling.column * CELL + CELL / 2;
+  drawCoin(x, falling.y, falling.player);
+
+  if (falling.y >= target) {
+    board[falling.row][falling.column] = falling.player;
+    let played = falling.player;
+    falling = null;
+    finishTurn(played);
   }
 }
 
-function helpText() {
-  push();
-  noStroke();
-  fill('#344A40');
-  textSize(13);
-  text('CAMELLIA — SIMPLE SHAPES', 18, 25);
-  text('Press keys 1–0 to switch brushes. Drag your mouse to draw.', 18, 44);
-  text('Press X to clear, P to save, or use the buttons below.', 18, 63);
-  pop();
+function finishTurn(player) {
+  winningPieces = findFour(board, player);
+  if (winningPieces.length > 0) {
+    gameOver = true;
+    message = mode === 'computer' ?
+      (player === 1 ? 'You win! 🌸' : 'Computer wins!') :
+      'Player ' + player + ' wins!';
+    return;
+  }
+  if (board.every(row => row.every(cell => cell !== 0))) {
+    gameOver = true;
+    message = "It's a draw!";
+    return;
+  }
+  currentPlayer = player === 1 ? 2 : 1;
+  if (mode === 'computer' && currentPlayer === 2) {
+    computerMoveTime = millis() + 430;
+  }
+}
+
+function findFour(grid, player) {
+  const directions = [[0, 1], [1, 0], [1, 1], [-1, 1]];
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (grid[r][c] !== player) continue;
+      for (let [dr, dc] of directions) {
+        let line = [];
+        for (let k = 0; k < 4; k++) {
+          let rr = r + dr * k;
+          let cc = c + dc * k;
+          if (rr < 0 || rr >= ROWS || cc < 0 || cc >= COLS ||
+              grid[rr][cc] !== player) break;
+          line.push([rr, cc]);
+        }
+        if (line.length === 4) return line;
+      }
+    }
+  }
+  return [];
+}
+
+function chooseComputerColumn() {
+  // Computer tries to win, then block the player, then take the center.
+  let choices = [3, 2, 4, 1, 5, 0, 6].filter(c => getOpenRow(c) >= 0);
+  for (let player of [2, 1]) {
+    for (let c of choices) {
+      let r = getOpenRow(c);
+      board[r][c] = player;
+      let wouldWin = findFour(board, player).length > 0;
+      board[r][c] = 0;
+      if (wouldWin) return c;
+    }
+  }
+  return choices.length ? choices[0] : -1;
 }
