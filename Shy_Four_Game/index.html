@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F7F5EE">
+  <title>Shy Four | Camellia Connect 4</title>
+  <style>
+    :root { --cream:#F7F5EE; --green:#354B43; --coral:#D79D88; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:var(--cream); color:var(--green); font:16px/1.55 Arial, sans-serif; }
+    .wrap { max-width:680px; margin:0 auto; padding:16px 18px 34px; }
+    header { display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--green); padding:0 0 9px; }
+    .brand { font-size:14px; font-weight:700; letter-spacing:.08em; }
+    nav { display:flex; gap:20px; }
+    a { color:inherit; text-decoration:none; }
+    a:hover, a:focus-visible { text-decoration:underline; }
+    #game { display:flex; justify-content:center; }
+    #game canvas { display:block; width:100% !important; max-width:600px; height:auto !important; touch-action:manipulation; }
+    #load-error { margin:20px auto; padding:12px; border:1px solid var(--coral); max-width:600px; }
+    #load-error { font-size:14px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="#game">SHY FOUR</a>
+    <nav aria-label="Navigation"><a href="#game">Play</a></nav>
+  </header>
+  <main>
+    <div id="game" aria-label="Shy Four Connect 4 game board and game controls"></div>
+    <p id="load-error" hidden>Couldn't load p5.js. Please check your internet connection and reload this page.</p>
+  </main>
+</div>
+<!-- p5.js 1.x is used here for compatibility with the class editor. -->
+<script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/p5.min.js"></script>
+<script>
+  // Back-up library host. The artwork and game logic remain local to the folder.
+  if (!window.p5) {
+    document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.13/p5.min.js"><\/script>');
+  }
+</script>
+<script>
+  if (!window.p5) document.getElementById('load-error').hidden = false;
+</script>
+<script src="sketch.js"></script>
+</body>
+</html>
